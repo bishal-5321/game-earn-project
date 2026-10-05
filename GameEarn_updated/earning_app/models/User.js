@@ -1,0 +1,1 @@
+// Database tables are initialized by server.js.\nmodule.exports = {};\n
