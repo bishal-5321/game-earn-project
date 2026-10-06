@@ -1,1 +1,608 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GameEarn</title><link rel="stylesheet" href="/style.css"></head><body><header><b>GameEarn</b><nav><a href="#register">Register</a><a href="#login">Login</a></nav></header><main><section class="hero"><small>EARN • PLAY • REDEEM</small><h1>Earn rewards by completing games, offers and tasks.</h1><p>Complete offers, build your balance and request eligible rewards from $1.</p></section><section class="auth"><form class="card" id="register"><h2>Create account</h2><input name="username" placeholder="Username" required><input name="email" type="email" placeholder="Email" required><input name="password" type="password" placeholder="Password" required><button>Create account</button><p id="rm"></p></form><form class="card" id="login"><h2>Log in</h2><input name="email" type="email" placeholder="Email" required><input name="password" type="password" placeholder="Password" required><button>Log in</button><p id="lm"></p></form></section></main><script>async function post(u,d){let r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}),j=await r.json();if(!r.ok)throw Error(j.error);return j}register.onsubmit=async e=>{e.preventDefault();try{await post("/api/register",Object.fromEntries(new FormData(e.target)));location="/dashboard.html"}catch(x){rm.textContent=x.message}};login.onsubmit=async e=>{e.preventDefault();try{await post("/api/login",Object.fromEntries(new FormData(e.target)));location="/dashboard.html"}catch(x){lm.textContent=x.message}}</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>GameEarn — Earn Rewards</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: #07111f;
+      color: #f4f7ff;
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* NAVBAR */
+
+    header {
+      height: 76px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 7%;
+      background: rgba(7,17,31,.92);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .logo span {
+      color: #4d82ff;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    nav a {
+      color: #aebbd1;
+      font-size: 14px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    nav a:hover {
+      color: white;
+    }
+
+    .nav-login {
+      background: #477cff;
+      color: white !important;
+      padding: 11px 19px;
+      border-radius: 10px;
+    }
+
+    /* HERO */
+
+    main {
+      max-width: 1250px;
+      margin: auto;
+      padding: 70px 25px 100px;
+    }
+
+    .hero {
+      text-align: center;
+      max-width: 850px;
+      margin: 25px auto 65px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 999px;
+      background: rgba(73,124,255,.12);
+      border: 1px solid rgba(73,124,255,.25);
+      color: #72a0ff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1.03;
+      letter-spacing: -3px;
+      margin-bottom: 24px;
+    }
+
+    h1 span {
+      color: #5b88ff;
+    }
+
+    .hero p {
+      color: #94a5bd;
+      font-size: 18px;
+      line-height: 1.7;
+      max-width: 680px;
+      margin: auto;
+    }
+
+    /* FEATURE CARDS */
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 55px;
+    }
+
+    .feature {
+      background: #0d1a2d;
+      border: 1px solid #1c304b;
+      border-radius: 18px;
+      padding: 27px;
+      min-height: 170px;
+    }
+
+    .feature-icon {
+      font-size: 27px;
+      margin-bottom: 18px;
+    }
+
+    .feature h3 {
+      font-size: 18px;
+      margin-bottom: 9px;
+    }
+
+    .feature p {
+      color: #8294ae;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* AUTH */
+
+    .auth-title {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .auth-title h2 {
+      font-size: 29px;
+      margin-bottom: 8px;
+    }
+
+    .auth-title p {
+      color: #8294ae;
+      font-size: 14px;
+    }
+
+    .auth {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      max-width: 950px;
+      margin: auto;
+    }
+
+    .card {
+      background: #0d1a2d;
+      border: 1px solid #1c304b;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 15px 50px rgba(0,0,0,.18);
+    }
+
+    .card small {
+      color: #5d8aff;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    .card h2 {
+      margin: 10px 0 7px;
+      font-size: 26px;
+    }
+
+    .card-description {
+      color: #8193ad;
+      font-size: 13px;
+      margin-bottom: 23px;
+    }
+
+    input {
+      width: 100%;
+      height: 53px;
+      background: #081525;
+      border: 1px solid #263c58;
+      border-radius: 11px;
+      color: white;
+      padding: 0 16px;
+      margin-bottom: 13px;
+      outline: none;
+      font-size: 14px;
+      transition: .2s;
+    }
+
+    input:focus {
+      border-color: #5685ff;
+      box-shadow: 0 0 0 3px rgba(86,133,255,.1);
+    }
+
+    input::placeholder {
+      color: #63758e;
+    }
+
+    button {
+      width: 100%;
+      height: 53px;
+      border: 0;
+      border-radius: 11px;
+      background: linear-gradient(135deg,#477cff,#6653f5);
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s;
+      margin-top: 4px;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .message {
+      min-height: 20px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #ff8080;
+    }
+
+    .security {
+      text-align: center;
+      color: #62758f;
+      font-size: 12px;
+      margin-top: 22px;
+    }
+
+    /* FOOTER */
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,.07);
+      text-align: center;
+      padding: 28px;
+      color: #61738c;
+      font-size: 12px;
+    }
+
+    /* MOBILE */
+
+    @media(max-width: 800px) {
+
+      header {
+        padding: 0 20px;
+      }
+
+      nav {
+        gap: 14px;
+      }
+
+      nav a:not(.nav-login) {
+        display: none;
+      }
+
+      main {
+        padding: 45px 17px 70px;
+      }
+
+      .hero {
+        margin-bottom: 45px;
+      }
+
+      h1 {
+        letter-spacing: -2px;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .auth {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+
+  <a href="/" class="logo">
+    GAME<span>EARN</span>
+  </a>
+
+  <nav>
+    <a href="#features">How it works</a>
+    <a href="#register">Register</a>
+    <a href="#login" class="nav-login">Sign in</a>
+  </nav>
+
+</header>
+
+
+<main>
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="badge">
+      EARN • PLAY • REDEEM
+    </div>
+
+    <h1>
+      Turn your gaming time into <span>real rewards.</span>
+    </h1>
+
+    <p>
+      Complete games, offers and tasks, build your balance,
+      and redeem your rewards when you reach the minimum.
+    </p>
+
+  </section>
+
+
+  <!-- FEATURES -->
+
+  <section class="features" id="features">
+
+    <div class="feature">
+
+      <div class="feature-icon">🎮</div>
+
+      <h3>Play & Earn</h3>
+
+      <p>
+        Complete game offers and reach the required milestones
+        to earn rewards.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="feature-icon">💳</div>
+
+      <h3>Easy Redeem</h3>
+
+      <p>
+        Choose an available reward and submit your payment
+        details when you're ready.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="feature-icon">👥</div>
+
+      <h3>Refer Friends</h3>
+
+      <p>
+        Invite friends and earn additional rewards through
+        the referral program.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- AUTH TITLE -->
+
+  <div class="auth-title">
+
+    <h2>Start earning today</h2>
+
+    <p>
+      Create your account or sign in to continue.
+    </p>
+
+  </div>
+
+
+  <!-- AUTH -->
+
+  <section class="auth">
+
+    <!-- REGISTER -->
+
+    <form class="card" id="register">
+
+      <small>NEW HERE?</small>
+
+      <h2>Create account</h2>
+
+      <p class="card-description">
+        Use a real email address. You'll need access to it
+        for account verification.
+      </p>
+
+      <input
+        name="username"
+        placeholder="Username"
+        autocomplete="username"
+        required
+      >
+
+      <input
+        name="email"
+        type="email"
+        placeholder="Email address"
+        autocomplete="email"
+        required
+      >
+
+      <input
+        name="password"
+        type="password"
+        placeholder="Password"
+        autocomplete="new-password"
+        required
+      >
+
+      <button type="submit">
+        Create account
+      </button>
+
+      <p class="message" id="rm"></p>
+
+    </form>
+
+
+    <!-- LOGIN -->
+
+    <form class="card" id="login">
+
+      <small>WELCOME BACK</small>
+
+      <h2>Sign in</h2>
+
+      <p class="card-description">
+        Sign in to access your GameEarn dashboard.
+      </p>
+
+      <input
+        name="email"
+        type="email"
+        placeholder="Email address"
+        autocomplete="email"
+        required
+      >
+
+      <input
+        name="password"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button type="submit">
+        Sign in
+      </button>
+
+      <p class="message" id="lm"></p>
+
+    </form>
+
+  </section>
+
+
+  <div class="security">
+    🔒 Your account information is protected.
+  </div>
+
+</main>
+
+
+<footer>
+  © 2026 GameEarn. Earn rewards. Play more.
+</footer>
+
+
+<script>
+
+async function post(url, data) {
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("Server returned an invalid response.");
+  }
+
+  if (!response.ok) {
+    throw new Error(result.error || "Something went wrong.");
+  }
+
+  return result;
+}
+
+
+/* REGISTER */
+
+document.getElementById("register").addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+
+  const message = document.getElementById("rm");
+
+  message.textContent = "";
+
+  const formData = Object.fromEntries(
+    new FormData(this)
+  );
+
+  try {
+
+    await post("/api/register", formData);
+
+    window.location.href = "/dashboard.html";
+
+  } catch(error) {
+
+    message.textContent = error.message;
+
+  }
+
+});
+
+
+/* LOGIN */
+
+document.getElementById("login").addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+
+  const message = document.getElementById("lm");
+
+  message.textContent = "";
+
+  const formData = Object.fromEntries(
+    new FormData(this)
+  );
+
+  try {
+
+    await post("/api/login", formData);
+
+    window.location.href = "/dashboard.html";
+
+  } catch(error) {
+
+    message.textContent = error.message;
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
